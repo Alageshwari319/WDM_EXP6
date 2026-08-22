@@ -1,5 +1,5 @@
 ### EX6 Information Retrieval Using Vector Space Model in Python
-### DATE: 
+### DATE: 18.08.2026
 ### AIM: To implement Information Retrieval Using Vector Space Model in Python.
 ### Description: 
 <div align = "justify">
@@ -15,63 +15,129 @@ sklearn to demonstrate Information Retrieval using the Vector Space Model.
 5. Execute a sample query and display the search results along with similarity scores.
 
 ### Program:
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+import string
+import nltk
 
-    import requests
-    from bs4 import BeautifulSoup
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    from sklearn.metrics.pairwise import cosine_similarity
-    from nltk.tokenize import word_tokenize
-    from nltk.corpus import stopwords
-    import string
-    import nltk
+# Download NLTK resources
+nltk.download('punkt')
+nltk.download('punkt_tab')
+nltk.download('stopwords')
 
-    nltk.download('punkt')
-    nltk.download('stopwords')
 
-###### Sample documents stored in a dictionary
-    documents = {
-        "doc1": "This is the first document.",
-        "doc2": "This document is the second document.",
-        "doc3": "And this is the third one.",
-        "doc4": "Is this the first document?",
-    }
+# Sample documents
+documents = {
+    "doc1": "This is the first document.",
+    "doc2": "This document is the second document.",
+    "doc3": "And this is the third one.",
+    "doc4": "Is this the first document?",
+}
 
-###### Preprocessing function to tokenize and remove stopwords/punctuation
-    def preprocess_text(text):
-        tokens = word_tokenize(text.lower())
-        tokens = [token for token in tokens if token not in stopwords.words("english") and token not in               string.punctuation]
-        return " ".join(tokens)
 
-###### Preprocess documents and store them in a dictionary
-    preprocessed_docs = {doc_id: preprocess_text(doc) for doc_id, doc in documents.items()}
+# Preprocessing function
+def preprocess_text(text):
+    tokens = word_tokenize(text.lower())
 
-###### Construct TF-IDF matrix
-    tfidf_vectorizer = TfidfVectorizer()
-    tfidf_matrix = tfidf_vectorizer.fit_transform(preprocessed_docs.values())
+    tokens = [
+        token for token in tokens
+        if token not in stopwords.words("english")
+        and token not in string.punctuation
+    ]
 
-###### Calculate cosine similarity between query and documents
-    def search(query, tfidf_matrix, tfidf_vectorizer):
-        //TYPE YOUR CODE HERE
+    return " ".join(tokens)
 
-###### Get input from user
-    query = input("Enter your query: ")
 
-###### Perform search
-    search_results = search(query, tfidf_matrix, tfidf_vectorizer)
+# Preprocess documents
+preprocessed_docs = {
+    doc_id: preprocess_text(doc)
+    for doc_id, doc in documents.items()
+}
 
-###### Display search results
-    print("Query:", query)
-    for i, result in enumerate(search_results, start=1):
-        print(f"\nRank: {i}")
-        print("Document ID:", result[0])
-        print("Document:", result[1])
-        print("Similarity Score:", result[2])
-        print("----------------------")
 
-###### Get the highest rank cosine score
-    highest_rank_score = max(result[2] for result in search_results)
-    print("The highest rank cosine score is:", highest_rank_score)
+# Create TF-IDF matrix
+tfidf_vectorizer = TfidfVectorizer()
+tfidf_matrix = tfidf_vectorizer.fit_transform(
+    preprocessed_docs.values()
+)
+
+
+# Search function
+def search(query, tfidf_matrix, tfidf_vectorizer):
+
+    # Preprocess query
+    processed_query = preprocess_text(query)
+
+    # Convert query into TF-IDF vector
+    query_vector = tfidf_vectorizer.transform([processed_query])
+
+    # Calculate cosine similarity
+    similarity_scores = cosine_similarity(
+        query_vector,
+        tfidf_matrix
+    ).flatten()
+
+    # Store document IDs
+    doc_ids = list(documents.keys())
+
+    # Create results
+    results = []
+
+    for i, score in enumerate(similarity_scores):
+        results.append(
+            (
+                doc_ids[i],
+                documents[doc_ids[i]],
+                score
+            )
+        )
+
+    # Sort according to similarity score
+    results.sort(key=lambda x: x[2], reverse=True)
+
+    return results
+
+
+# Get query from user
+query = input("Enter your query: ")
+
+
+# Perform search
+search_results = search(
+    query,
+    tfidf_matrix,
+    tfidf_vectorizer
+)
+
+
+# Display results
+print("\nQuery:", query)
+
+for i, result in enumerate(search_results, start=1):
+
+    print(f"\nRank: {i}")
+    print("Document ID:", result[0])
+    print("Document:", result[1])
+    print("Similarity Score:", result[2])
+    print("----------------------")
+
+
+# Get highest cosine similarity score
+highest_rank_score = max(
+    result[2] for result in search_results
+)
+
+print(
+    "\nThe highest rank cosine score is:",
+    highest_rank_score
+)
+```
 
 ### Output:
+<img width="1145" height="632" alt="image" src="https://github.com/user-attachments/assets/690e7984-6e01-4d6e-9f93-e3cfa024908a" />
 
 ### Result:
+Thus, the implementation of Information Retrieval Using Vector Space Model in Python is executed successfully.
